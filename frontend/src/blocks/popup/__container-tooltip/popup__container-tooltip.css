@@ -1,0 +1,17 @@
+.popup__container-tooltip {
+    position: relative;
+    width: 282px;
+    background-color: white;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 25px 22px;
+    text-align: center;
+}
+
+@media screen and (min-width: 620px) {
+    .popup__container-tooltip {
+        width: 430px;
+        padding-bottom: 38px;
+        padding: 60px 36px;
+    }
+}

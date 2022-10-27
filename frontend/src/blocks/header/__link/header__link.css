@@ -1,0 +1,19 @@
+.header__link {
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: #ffffff;
+    margin-right: 27px;
+    margin-left: 24px;
+}
+
+@media screen and (min-width: 900px) {
+    .header__link {
+        margin-right: 0;
+    }
+}
+
+.opacity {
+    opacity: 0.6;
+}

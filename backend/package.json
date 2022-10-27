@@ -1,0 +1,45 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "Project Mesto - Backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Svojest/express-mesto-gha.git"
+  },
+  "author": "Mikhail Elistratov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Svojest/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/Svojest/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.25.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.1",
+    "celebrate": "^15.0.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.6.0",
+    "express-winston": "^4.2.0",
+    "helmet": "^6.0.0",
+    "joi": "^17.6.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.6.5",
+    "validator": "^13.7.0",
+    "winston": "^3.8.2"
+  },
+  "keywords": []
+}

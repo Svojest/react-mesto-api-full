@@ -1,0 +1,17 @@
+.form__button {
+    margin-top: 173px;
+    padding: 14px 35px;
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.form__button:hover {
+    opacity: 0.85;
+}
+
+@media screen and (min-width: 620px) {
+    .form__button {
+        margin-top: 216px;
+    }
+}
