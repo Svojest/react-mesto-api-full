@@ -1,7 +1,6 @@
 import { CurrentUserContext } from 'context/CurrentUserContext';
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
-// import { auth } from 'utils/auth';
 import { api } from '../utils/api';
 import AddPlacePopup from './AddPlacePopup';
 import EditAvatarPopup from './EditAvatarPopup';

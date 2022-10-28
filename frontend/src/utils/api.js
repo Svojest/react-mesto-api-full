@@ -5,8 +5,6 @@ class Api {
   }
 
   _sendRequest(path, options = {}) {
-    // Объект с опциями запроса нужно объединить с заголовками авторизации для дальнейшей передачи в fetch
-    // По умолчанию опции запроса пустые (для обычного GET-запроса без body)
     let optionsWithHeaders = {
       headers: {
         authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -28,7 +26,6 @@ class Api {
   }
 
   // Регистрация пользователя
-  // В случае ошибки здесь ее не ловим, возвращаем только Promise.reject
   register(email, password) {
     return fetch(`${this._authUrl}/signup`, {
       method: 'POST',
@@ -51,7 +48,6 @@ class Api {
   }
 
   // Авторизация пользователя
-  // В случае ошибки здесь ее не ловим, возвращаем только Promise.reject
   login(email, password) {
     return fetch(`${this._authUrl}/signin`, {
       method: 'POST',
