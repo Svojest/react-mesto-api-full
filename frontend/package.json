@@ -1,5 +1,5 @@
 {
-    "homepage": "https://svojest.github.io/react-mesto-auth/",
+    "homepage": "/",
     "name": "mesto-react-auth",
     "version": "0.1.0",
     "private": true,
@@ -14,7 +14,7 @@
         "web-vitals": "^2.1.4"
     },
     "scripts": {
-        "start": "react-scripts start",
+        "start": "cross-env PORT=7777 react-scripts start",
         "predeploy": "npm run build",
         "deploy": "gh-pages -d build",
         "build": "react-scripts build",
@@ -40,6 +40,7 @@
         ]
     },
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "gh-pages": "^4.0.0"
     }
 }

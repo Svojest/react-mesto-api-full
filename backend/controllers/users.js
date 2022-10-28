@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const User = require('../models/user');
 const ValidError = require('../errors/valid');
 const NotFoundError = require('../errors/notFound');
@@ -9,24 +11,14 @@ const { ERROR_TYPE, ERROR_MESSAGE } = require('../constans/errors');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  console.log('body', req.body);
-
-  // return res.json({hello:"yes"});
-
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // Создаем token
       const token = jwt.sign(
         { _id: user._id },
-        'some-secret-key',
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
         { expiresIn: '7d' },
       );
-      // Храним token в куки
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        sameSite: true,
-      });
       res.send({ token }).end();
     })
     .catch(next);
@@ -34,7 +26,7 @@ module.exports.login = (req, res, next) => {
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
@@ -44,7 +36,7 @@ module.exports.getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === ERROR_TYPE.valid || err.name === ERROR_TYPE.cast) {
@@ -60,7 +52,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch(next);
 };
@@ -104,7 +96,7 @@ module.exports.updateUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === ERROR_TYPE.valid || err.name === ERROR_TYPE.cast) {
@@ -125,7 +117,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === ERROR_TYPE.valid || err.name === ERROR_TYPE.cast) {

@@ -8,7 +8,7 @@ const ValidError = require('../errors/valid');
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => {
-      res.send({ data: card });
+      res.send(card);
     })
     .catch(next);
 };
@@ -17,7 +17,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === ERROR_TYPE.valid) {
         next(new ValidError(ERROR_MESSAGE.valid));
@@ -38,7 +38,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new ForbiddenError(ERROR_MESSAGE.forbidden);
       }
       Card.findByIdAndRemove(req.params.cardId)
-        .then((deletedCard) => res.send({ data: deletedCard }))
+        .then((deletedCard) => res.send(deletedCard))
         .catch(next);
     })
     .catch(next);
@@ -54,7 +54,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: card });
+      res.send(card);
     })
     .catch(next);
 };
@@ -69,7 +69,7 @@ module.exports.unlikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError(ERROR_MESSAGE.notFound);
       }
-      res.send({ data: card });
+      res.send(card);
     })
     .catch(next);
 };

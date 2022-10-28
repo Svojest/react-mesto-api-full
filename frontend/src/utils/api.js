@@ -1,87 +1,167 @@
 class Api {
-    constructor(options) {
-        this._baseUrl = options.baseUrl;
-        this._headers = options.headers;
-    }
+  constructor(options) {
+    this._baseUrl = options.baseUrl;
+    this._authUrl = options.authUrl;
+  }
 
-    _checkResponse(res) {
-        if (res.ok) {
-            return res.json();
-        }
-        return Promise.reject(`Ошибка запроса: ${res.status}`);
-    }
+  _sendRequest(path, options = {}) {
+    // Объект с опциями запроса нужно объединить с заголовками авторизации для дальнейшей передачи в fetch
+    // По умолчанию опции запроса пустые (для обычного GET-запроса без body)
+    let optionsWithHeaders = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
+    };
+    optionsWithHeaders = Object.assign(options, optionsWithHeaders);
 
-    getUserInfo() {
-        return fetch(`${this._baseUrl}/users/me`, {
-            method: 'GET',
-            headers: this._headers,
-        }).then(this._checkResponse);
-    }
+    return fetch(`${this._baseUrl}/${path}`, optionsWithHeaders)
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        // Если ошибка, отклоняем промис
+        return Promise.reject(`Ошибка: ${res.status}`);
+      }
+    })
+    .catch((err) => console.log(err));
+  }
 
-    setUserInfo(userData) {
-        return fetch(`${this._baseUrl}/users/me`, {
-            method: 'PATCH',
-            headers: this._headers,
-            body: JSON.stringify({
-                name: userData.name,
-                about: userData.about,
-            }),
-        }).then(this._checkResponse);
-    }
+  // Регистрация пользователя
+  // В случае ошибки здесь ее не ловим, возвращаем только Promise.reject
+  register(email, password) {
+    return fetch(`${this._authUrl}/signup`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({email, password})
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+      }
+    })
+    .then((res) => {
+      return res;
+    })
+  }
 
-    getInitialCards() {
-        return fetch(`${this._baseUrl}/cards`, {
-            method: 'GET',
-            headers: this._headers,
-        }).then(this._checkResponse);
-    }
+  // Авторизация пользователя
+  // В случае ошибки здесь ее не ловим, возвращаем только Promise.reject
+  login(email, password) {
+    return fetch(`${this._authUrl}/signin`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({email, password})
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+      }
+    })
+    .then((data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        return data;
+      } else {
+        return Promise.reject(`Ошибка: нет токена`);
+      }
+    })
+  }
 
-    addCard(data) {
-        return fetch(`${this._baseUrl}/cards`, {
-            method: 'POST',
-            headers: this._headers,
-            body: JSON.stringify({
-                name: data.name,
-                link: data.link,
-            }),
-        }).then(this._checkResponse);
-    }
-    deleteCard(id) {
-        return fetch(`${this._baseUrl}/cards/${id}`, {
-            method: 'DELETE',
-            headers: this._headers,
-        }).then(this._checkResponse);
-    }
-    setLike(id) {
-        return fetch(`${this._baseUrl}/cards/likes/${id}`, {
-            method: 'PUT',
-            headers: this._headers,
-        }).then(this._checkResponse);
-    }
-    unsetLike(id) {
-        return fetch(`${this._baseUrl}/cards/likes/${id}`, {
-            method: 'DELETE',
-            headers: this._headers,
-        }).then(this._checkResponse);
-    }
-    setAvatar(data) {
-        return fetch(`${this._baseUrl}/users/me/avatar`, {
-            method: 'PATCH',
-            headers: this._headers,
-            body: JSON.stringify({
-                avatar: data.avatar,
-            }),
-        }).then(this._checkResponse);
-    }
-    changeLikeCardStatus(id, isLiked) {
-        return isLiked ? this.setLike(id) : this.unsetLike(id);
-    }
+  // Проверка токена пользователя
+  getContent(token) {
+    return fetch(`${this._authUrl}/users/me`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      }
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+      }
+    })
+    .then(data => data)
+  }
+
+  // Далее функции работы с данными
+  getUserInfo() {
+    return this._sendRequest('users/me');
+  }
+
+  setUserInfo({ name, about }) {
+    return this._sendRequest('users/me', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        name: name,
+        about: about
+      })
+    });
+  }
+
+  getInitialCards() {
+    return this._sendRequest('cards');
+  }
+
+  addCard({ name, link }) {
+    return this._sendRequest('cards', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: name,
+        link: link
+      })
+    });
+  }
+
+  deleteCard(id) {
+    return this._sendRequest(`cards/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  setLike(id) {
+    return this._sendRequest(`cards/${id}/likes`, {
+      method: 'PUT'
+    });
+  }
+
+  unsetLike(id) {
+    return this._sendRequest(`cards/${id}/likes`, {
+      method: 'DELETE'
+    });
+  }
+
+  changeLikeCardStatus(id, isLiked) {
+    return isLiked ? this.setLike(id) : this.unsetLike(id);
+  }
+
+  setAvatar({ avatar }) {
+    return this._sendRequest('users/me/avatar', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        avatar: avatar
+      })
+    });
+  }
+
 }
 
+// Экспортируем сразу экземпляр класса Api с нужными параметрами
 export const api = new Api({
-    baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-45',
-    headers: {
-        authorization: '0565dd97-638e-4b52-968c-599227ddda4c',
-        'Content-Type': 'application/json',
-    },
+  baseUrl: 'http://localhost:3000',
+  authUrl: 'http://localhost:3000',
 });

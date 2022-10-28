@@ -1,7 +1,7 @@
 import { CurrentUserContext } from 'context/CurrentUserContext';
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
-import { auth } from 'utils/auth';
+// import { auth } from 'utils/auth';
 import { api } from '../utils/api';
 import AddPlacePopup from './AddPlacePopup';
 import EditAvatarPopup from './EditAvatarPopup';
@@ -21,7 +21,7 @@ function App() {
     const [selectedCard, setSelectedCard] = useState(null);
     const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
-    const [currentUser, setCurrentUser] = useState({});
+    const [currentUser, setCurrentUser] = useState([]);
     const [cards, setCards] = useState([]);
 
     const [email, setEmail] = useState('');
@@ -31,21 +31,36 @@ function App() {
 
     const history = useHistory();
 
-    // Получение с сервера информации о пользователе и карточек
     useEffect(() => {
-        Promise.all([api.getUserInfo(), api.getInitialCards()])
-            .then(([userData, userCards]) => {
-                setCurrentUser(userData);
-                setCards(userCards);
-            })
-            .catch(() => {
-                console.log('Произошла ошибка');
-            });
-    }, []);
+        // Проверяем, есть ли сохраненный токен пользователя
+        if (localStorage.getItem('token')) {
+          const token = localStorage.getItem('token');
+          tokenCheck(token);
+        }
+      }, []);
+
+      function tokenCheck(jwt) {
+        if (jwt) {
+          api.getContent(jwt).then((res) => {
+            if (res) {
+              // Авторизуем пользователя
+              setLoggedIn(true);
+              // Сохраним нужные данные
+              setEmail(res.email);
+              // Загрузим информацию для главной страницы
+              loadUserData();
+              // Перенаправим на главную
+              history.push("/");
+            }
+          })
+          .catch((err) => console.log(err));
+        }
+      }
 
     function handleEditProfileClick() {
         setIsEditProfilePopupOpen(true);
     }
+
     function handleAddPlaceClick() {
         setIsAddPlacePopupOpen(true);
     }
@@ -78,13 +93,12 @@ function App() {
 
     function handleCardLike(card) {
         // Снова проверяем, есть ли уже лайк на этой карточке
-
-        const isLiked = card.likes.some((i) => i._id === currentUser._id);
+        const isLiked = card.likes.some(i => i === currentUser._id);
 
         // Отправляем запрос в API и получаем обновлённые данные карточки
         api.changeLikeCardStatus(card._id, !isLiked)
             .then((newCard) => {
-                setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
+                setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
             })
             .catch((err) => {
                 console.log(err);
@@ -100,6 +114,7 @@ function App() {
                 console.log(err);
             });
     }
+
 
     function handleUpdateAvatar(newAvatar) {
         api.setAvatar(newAvatar)
@@ -128,7 +143,7 @@ function App() {
     }
 
     function handleRegister(email, password) {
-        auth.register(email, password)
+        api.register(email, password)
             .then((user) => {
                 if (user) {
                     setEmail(user.email);
@@ -150,30 +165,13 @@ function App() {
         localStorage.removeItem('token');
     }
 
-    useEffect(() => {
-        const jwt = localStorage.getItem('token');
-        if (jwt) {
-            auth.checkToken(jwt)
-                .then((res) => {
-                    if (res) {
-                        setLoggedIn(true);
-                        setEmail(res.data.email);
-                        history.push('/');
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, [email, history]);
-
     function handleLogin(email, password) {
-        auth.autorization(email, password)
+        api.login(email, password)
             .then((res) => {
-                if (res) {
-                    localStorage.setItem('token', res.token);
-                    setEmail(email);
+                if (res.token) {
+                    tokenCheck(res.token);
                     setLoggedIn(true);
+                    setEmail(email);
                     history.push('/');
                 }
             })
@@ -183,6 +181,23 @@ function App() {
                 setIsTooltipOpen(true);
             });
     }
+
+    function loadUserData() {
+        api.getUserInfo()
+          .then((resUserInfo) => {
+              setCurrentUser(resUserInfo);
+            //   console.dir(resUserInfo);
+            })
+            .catch((err) => console.log(err));
+            api.getInitialCards()
+            .then((resCards) => {
+                setCards(resCards)
+                // console.dir(resCards)
+        })
+        .catch((err) => console.log(err));
+    }
+
+      
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
