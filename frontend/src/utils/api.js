@@ -158,6 +158,6 @@ class Api {
 
 // Экспортируем сразу экземпляр класса Api с нужными параметрами
 export const api = new Api({
-  baseUrl: 'http://localhost:3000',
-  authUrl: 'http://localhost:3000',
+  baseUrl: 'api.svojest.mesto.nomoredomains.icu',
+  authUrl: 'api.svojest.mesto.nomoredomains.icu',
 });
