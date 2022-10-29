@@ -1,7 +1,7 @@
 class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
-    this._authUrl = options.authUrl;
+    this._baseUrl = options.baseUrl;
   }
 
   _sendRequest(path, options = {}) {
@@ -27,7 +27,7 @@ class Api {
 
   // Регистрация пользователя
   register(email, password) {
-    return fetch(`${this._authUrl}/signup`, {
+    return fetch(`${this._baseUrl}/signup`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -49,7 +49,7 @@ class Api {
 
   // Авторизация пользователя
   login(email, password) {
-    return fetch(`${this._authUrl}/signin`, {
+    return fetch(`${this._baseUrl}/signin`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -76,7 +76,7 @@ class Api {
 
   // Проверка токена пользователя
   getContent(token) {
-    return fetch(`${this._authUrl}/users/me`, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -156,8 +156,6 @@ class Api {
 
 }
 
-// Экспортируем сразу экземпляр класса Api с нужными параметрами
 export const api = new Api({
   baseUrl: 'http://api.svojest.mesto.nomoredomains.icu',
-  authUrl: 'http://api.svojest.mesto.nomoredomains.icu',
 });
