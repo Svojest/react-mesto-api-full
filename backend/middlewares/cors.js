@@ -1,6 +1,6 @@
 const allowedCors = [
-  // 'http://svojest.mesto.nomoredomains.icu',
-  'http://localhost:7777',
+  'http://svojest.mesto.nomoredomains.icu',
+  'http://localhost:3000',
 
 ];
 
