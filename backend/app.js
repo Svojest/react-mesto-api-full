@@ -34,6 +34,13 @@ app.use(limiter);
 app.use(helmet());
 
 app.use(requestLogger); // подключаем логгер запросов
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.use(routes);
 app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());

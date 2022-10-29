@@ -156,5 +156,5 @@ class Api {
 }
 
 export const api = new Api({
-  baseUrl: 'http://api.svojest.mesto.nomoredomains.icu',
+  baseUrl: 'https://api.svojest.mesto.nomoredomains.icu',
 });
